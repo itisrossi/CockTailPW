@@ -107,12 +107,10 @@ interface CocktailService {
     @GET("search.php")
     suspend fun getCocktailsByLetter(@Query("f") letter: String): ApiResponse
 
+    
     @GET("search.php")
     suspend fun searchCocktails(@Query("s") query: String): ApiResponse
-
-    @GET("random.php")
-    suspend fun getRandomCocktail(): ApiResponse
-
+    
     
     @GET("filter.php")
     suspend fun getCocktailsByIngredient(@Query("i") ingredient: String): ApiResponse
