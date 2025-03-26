@@ -8,13 +8,12 @@ import retrofit2.converter.gson.GsonConverterFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-// --- Risposta per le chiamate che restituiscono cocktail ---
 data class ApiResponse(
     @SerializedName("drinks")
     val drinks: List<Drink>?
 )
 
-// Data class per rappresentare un cocktail
+
 data class Drink(
     @SerializedName("idDrink")
     val idDrink: String,
@@ -92,7 +91,7 @@ data class Drink(
     val strMeasure15: String?
 )
 
-// --- Risposta per la lista degli ingredienti ---
+
 data class Ingredient(
     @SerializedName("strIngredient1")
     val ingredient: String
@@ -103,7 +102,7 @@ data class IngredientResponse(
     val drinks: List<Ingredient>?
 )
 
-// Interfaccia Retrofit
+
 interface CocktailService {
     @GET("search.php")
     suspend fun getCocktailsByLetter(@Query("f") letter: String): ApiResponse
@@ -114,15 +113,15 @@ interface CocktailService {
     @GET("random.php")
     suspend fun getRandomCocktail(): ApiResponse
 
-    // Endpoint per filtrare per ingrediente
+    
     @GET("filter.php")
     suspend fun getCocktailsByIngredient(@Query("i") ingredient: String): ApiResponse
 
-    // Endpoint per ottenere la lista degli ingredienti
+
     @GET("list.php")
     suspend fun getIngredientsList(@Query("i") list: String): IngredientResponse
 
-    // Nuovo endpoint lookup per ottenere i dettagli tramite idDrink
+
     @GET("lookup.php")
     suspend fun lookupCocktail(@Query("i") id: String): ApiResponse
 }
