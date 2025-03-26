@@ -1,5 +1,6 @@
 package com.example.cocktailpw
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,6 +13,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import androidx.navigation.NavHostController
@@ -64,30 +66,28 @@ fun HomeScreen(navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(Color.Black) // Sfondo nero
             .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Button(
             onClick = { navController.navigate("search") },
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black),
             modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
         ) {
             Text("Cerca Cocktail")
         }
         Button(
             onClick = { navController.navigate("list") },
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black),
             modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
         ) {
             Text("Lista Cocktail")
         }
         Button(
-            onClick = { navController.navigate("guess") },
-            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
-        ) {
-            Text("Indovina il Cocktail")
-        }
-        Button(
             onClick = { navController.navigate("ingredientSearch") },
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black),
             modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
         ) {
             Text("Cerca Ingredienti")
@@ -164,7 +164,7 @@ fun ListScreen(onDrinkSelected: (Drink) -> Unit) {
         }
         Spacer(modifier = Modifier.height(16.dp))
         if (cocktails.isEmpty()) {
-            Text("Nessun cocktail trovato per la lettera $selectedLetter")
+            Text("Nessun cocktail trovato")
         } else {
             LazyColumn {
                 items(cocktails) { cocktail ->
@@ -192,116 +192,6 @@ fun ListScreen(onDrinkSelected: (Drink) -> Unit) {
         }
     }
 }
-
-
-@Composable
-fun GuessScreen(onDrinkSelected: (Drink) -> Unit) {
-    var randomDrink by remember { mutableStateOf<Drink?>(null) }
-    var guessedLetters by remember { mutableStateOf(setOf<Char>()) }
-    var wrongGuesses by remember { mutableStateOf(0) }
-    val maxWrong = 6
-    val coroutineScope = rememberCoroutineScope()
-
-    LaunchedEffect(Unit) {
-        randomDrink = fetchRandomCocktail()
-        guessedLetters = emptySet()
-        wrongGuesses = 0
-    }
-
-    if (randomDrink == null) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator()
-        }
-        return
-    }
-
-    val targetWord = randomDrink!!.strDrink.uppercase()
-    val displayWord = targetWord.map {
-        if (!it.isLetter()) it else if (guessedLetters.contains(it)) it else '_'
-    }.joinToString(" ")
-
-    val hasWon = displayWord.replace(" ", "") == targetWord.replace(" ", "")
-    val hasLost = wrongGuesses >= maxWrong
-
-    Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            "The Hangman - Guess the Cocktail",
-            style = MaterialTheme.typography.titleLarge
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(text = displayWord, style = MaterialTheme.typography.headlineMedium)
-        Spacer(modifier = Modifier.height(16.dp))
-        Text("Errori: $wrongGuesses / $maxWrong")
-        Spacer(modifier = Modifier.height(16.dp))
-        if (!hasWon && !hasLost) {
-            val letters = ('A'..'Z').toList()
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(7),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = PaddingValues(8.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(260.dp)
-            ) {
-                items(letters.size) { index ->
-                    val letter = letters[index]
-                    Button(
-                        onClick = {
-                            guessedLetters += letter
-                            if (!targetWord.contains(letter)) {
-                                wrongGuesses++
-                            }
-                        },
-                        enabled = !guessedLetters.contains(letter),
-                        modifier = Modifier.size(56.dp),
-                        contentPadding = PaddingValues(0.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = letter.toString(),
-                                style = MaterialTheme.typography.bodyLarge
-                            )
-                        }
-                    }
-                }
-            }
-        } else {
-            if (hasWon) {
-                Text(
-                    "Hai vinto! Il cocktail era: ${randomDrink!!.strDrink}",
-                    color = MaterialTheme.colorScheme.primary
-                )
-            } else if (hasLost) {
-                Text(
-                    "Hai perso! Il cocktail era: ${randomDrink!!.strDrink}",
-                    color = MaterialTheme.colorScheme.error
-                )
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = { onDrinkSelected(randomDrink!!) }) {
-                Text("Visualizza dettagli")
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = {
-                guessedLetters = emptySet()
-                wrongGuesses = 0
-                coroutineScope.launch {
-                    randomDrink = fetchRandomCocktail()
-                }
-            }) {
-                Text("Ricomincia")
-            }
-        }
-    }
-}
-
 
 @Composable
 fun DrinkDetailsScreen(drinkId: String) {
@@ -406,7 +296,6 @@ fun IngredientSearchScreen(onDrinkSelected: (Drink) -> Unit) {
         }
 
         if (cocktails.isNotEmpty()) {
-            Text("Cocktail trovati per l'ingrediente \"$ingredientQuery\":")
             LazyColumn(modifier = Modifier.fillMaxWidth()) {
                 items(cocktails) { drink ->
                     Card(
@@ -477,18 +366,6 @@ suspend fun fetchCocktailsByName(query: String): List<Drink> {
         } catch (e: Exception) {
             e.printStackTrace()
             emptyList()
-        }
-    }
-}
-
-suspend fun fetchRandomCocktail(): Drink? {
-    return withContext(Dispatchers.IO) {
-        try {
-            val response = ApiClient.service.getRandomCocktail()
-            response.drinks?.firstOrNull()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
         }
     }
 }
