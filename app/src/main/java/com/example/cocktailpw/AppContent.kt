@@ -1,11 +1,12 @@
 package com.example.cocktailpw
 
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -13,10 +14,10 @@ import androidx.navigation.compose.composable
 @Composable
 fun AppContent() {
     val navController = rememberNavController()
-
     var selectedDrink by remember { mutableStateOf<Drink?>(null) }
 
     Scaffold(
+        modifier = Modifier.background(Color.Black), // Sfondo nero
         topBar = { TopBar() },
         bottomBar = { BottomBar(onHomeClick = { navController.navigate("home") }) }
     ) { innerPadding ->
@@ -40,12 +41,6 @@ fun AppContent() {
                     navController.navigate("drinkDetails")
                 })
             }
-            composable("guess") {
-                GuessScreen(onDrinkSelected = { drink ->
-                    selectedDrink = drink
-                    navController.navigate("drinkDetails")
-                })
-            }
             composable("ingredientSearch") {
                 IngredientSearchScreen(onDrinkSelected = { drink ->
                     selectedDrink = drink
@@ -62,21 +57,26 @@ fun AppContent() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar() {
-    androidx.compose.material3.CenterAlignedTopAppBar(
-        title = { androidx.compose.material3.Text("Dotti Cocktail") }
+    CenterAlignedTopAppBar(
+        title = { Text("Cocktail PW", color = Color.White) }, // Testo bianco per contrasto
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Black)
     )
 }
 
 @Composable
 fun BottomBar(onHomeClick: () -> Unit) {
-
-    androidx.compose.material3.BottomAppBar {
-        androidx.compose.foundation.layout.Box(
+    BottomAppBar(
+        containerColor = Color.Black // Sfondo nero per la barra inferiore
+    ) {
+        Box(
             modifier = Modifier.fillMaxWidth(),
-            contentAlignment = androidx.compose.ui.Alignment.Center
+            contentAlignment = Alignment.Center
         ) {
-            androidx.compose.material3.Button(onClick = onHomeClick) {
-                androidx.compose.material3.Text("Home")
+            Button(
+                onClick = onHomeClick,
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black)
+            ) {
+                Text("Home")
             }
         }
     }
